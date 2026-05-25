@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Create a standalone FastAPI project (`alfred-backend`) with a JWT-protected `/login` + `/ask` endpoint that the Minecraft mod will call.
+**Goal:** Create a standalone FastAPI project (`MinecraftButlerAI Backend`) with a JWT-protected `/login` + `/ask` endpoint that the Minecraft mod will call.
 
 **Architecture:** Single `main.py` app. `/login` validates credentials from `.env` and issues a signed JWT. `/ask` verifies the bearer token and returns a mock speak action. All config comes from `.env` via `python-dotenv`.
 
@@ -10,8 +10,8 @@
 
 ---
 
-> **Prerequisites:** Python 3.11+ installed. Run all commands from inside `alfred-backend/`.
-> **Project location:** Create this project at `C:\Users\migue\Documents\Proyectos\alfred-backend\`
+> **Prerequisites:** Python 3.11+ installed. Run all commands from inside `MinecraftButlerAI Backend/`.
+> **Project location:** Create this project at `C:\Users\migue\Documents\Proyectos\MinecraftButlerAI Backend\`
 
 ---
 
@@ -19,13 +19,13 @@
 
 | Action | Path | Responsibility |
 |--------|------|----------------|
-| Create | `alfred-backend/.env` | Credentials and JWT secret |
-| Create | `alfred-backend/.gitignore` | Ignore .env and __pycache__ |
-| Create | `alfred-backend/requirements.txt` | Production dependencies |
-| Create | `alfred-backend/requirements-dev.txt` | Test dependencies |
-| Create | `alfred-backend/conftest.py` | Set default env vars before test imports |
-| Create | `alfred-backend/main.py` | Complete FastAPI app |
-| Create | `alfred-backend/test_main.py` | Full test suite |
+| Create | `MinecraftButlerAI Backend/.env` | Credentials and JWT secret |
+| Create | `MinecraftButlerAI Backend/.gitignore` | Ignore .env and __pycache__ |
+| Create | `MinecraftButlerAI Backend/requirements.txt` | Production dependencies |
+| Create | `MinecraftButlerAI Backend/requirements-dev.txt` | Test dependencies |
+| Create | `MinecraftButlerAI Backend/conftest.py` | Set default env vars before test imports |
+| Create | `MinecraftButlerAI Backend/main.py` | Complete FastAPI app |
+| Create | `MinecraftButlerAI Backend/test_main.py` | Full test suite |
 
 ---
 
@@ -40,8 +40,8 @@
 - [ ] **Step 1: Create the project directory**
 
 ```powershell
-New-Item -ItemType Directory -Path "C:\Users\migue\Documents\Proyectos\alfred-backend"
-cd "C:\Users\migue\Documents\Proyectos\alfred-backend"
+New-Item -ItemType Directory -Path "C:\Users\migue\Documents\Proyectos\MinecraftButlerAI Backend"
+cd "C:\Users\migue\Documents\Proyectos\MinecraftButlerAI Backend"
 git init
 ```
 
@@ -95,7 +95,7 @@ Expected: all packages install without errors.
 
 ```powershell
 git add .gitignore requirements.txt requirements-dev.txt
-git commit -m "chore: scaffold alfred-backend project"
+git commit -m "chore: scaffold MinecraftButlerAI Backend project"
 ```
 
 ---
@@ -389,7 +389,7 @@ Expected: `Unauthorized`
 
 ```powershell
 git add -A
-git commit -m "feat: complete alfred-backend Phase 2 mock bridge"
+git commit -m "feat: complete MinecraftButlerAI Backend Phase 2 mock bridge"
 ```
 
 ---

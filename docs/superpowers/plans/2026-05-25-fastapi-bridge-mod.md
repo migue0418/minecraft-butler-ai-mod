@@ -10,7 +10,7 @@
 
 ---
 
-> **Prerequisites:** `alfred-backend` is running on `http://localhost:8000` for integration testing.
+> **Prerequisites:** `MinecraftButlerAI Backend` is running on `http://localhost:8000` for integration testing.
 > **Important — Mojang mappings:** All Minecraft class names in this project use Mojang official mappings, NOT Yarn. See the translation table at the bottom.
 
 ---
@@ -309,7 +309,7 @@ git commit -m "feat: add /butler ask command with async FastAPI bridge"
 - [ ] **Step 1: Start the FastAPI backend (separate terminal)**
 
 ```powershell
-cd "C:\Users\migue\Documents\Proyectos\alfred-backend"
+cd "C:\Users\migue\Documents\Proyectos\MinecraftButlerAI Backend"
 .venv\Scripts\Activate.ps1
 uvicorn main:app --reload --port 8000
 ```

@@ -16,7 +16,7 @@ Add `/butler ask <message>` to the Minecraft mod. The command sends the player's
 | Project | Language | Repo |
 |---------|----------|------|
 | MinecraftButlerAI | Java 25 / Fabric | existing (this repo) |
-| alfred-backend | Python / FastAPI | separate repo |
+| MinecraftButlerAI Backend | Python / FastAPI | separate repo |
 
 ---
 
@@ -132,7 +132,7 @@ Uses Brigadier's `StringArgumentType.greedyString()` so the full sentence after 
 ### Project structure
 
 ```
-alfred-backend/
+MinecraftButlerAI Backend/
   .env               ← credentials and secret (git-ignored)
   .gitignore
   main.py            ← complete app (single file for Phase 2)
