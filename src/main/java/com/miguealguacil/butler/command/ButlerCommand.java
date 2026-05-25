@@ -1,13 +1,17 @@
 package com.miguealguacil.butler.command;
 
+import com.miguealguacil.butler.AIButler;
 import com.miguealguacil.butler.action.ButlerAction;
 import com.miguealguacil.butler.action.ButlerActionExecutor;
+import com.miguealguacil.butler.http.ButlerHttpClient;
 import com.miguealguacil.butler.state.ButlerState;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public final class ButlerCommand {
@@ -65,6 +69,41 @@ public final class ButlerCommand {
                             ctx.getSource());
                         return 1;
                     }))
+                .then(Commands.literal("ask")
+                    .then(Commands.argument("message", StringArgumentType.greedyString())
+                        .executes(ctx -> {
+                            CommandSourceStack source = ctx.getSource();
+                            MinecraftServer server = source.getServer();
+                            String message = StringArgumentType.getString(ctx, "message");
+
+                            source.sendSuccess(
+                                () -> Component.literal("[Alfred] Procesando..."), false);
+
+                            ButlerHttpClient.sendAsync(message)
+                                .thenAccept(actions ->
+                                    server.execute(() ->
+                                        actions.forEach(action ->
+                                            ButlerActionExecutor.execute(action, source))
+                                    )
+                                )
+                                .exceptionally(ex -> {
+                                    Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+                                    String msg;
+                                    if (cause instanceof ButlerHttpClient.AuthException) {
+                                        msg = "[Alfred] No pude autenticarme con el servidor.";
+                                    } else if (cause instanceof ButlerHttpClient.ServerException) {
+                                        msg = "[Alfred] Error del servidor.";
+                                    } else {
+                                        msg = "[Alfred] No pude contactar con el servidor.";
+                                    }
+                                    AIButler.LOGGER.error("Butler ask error", cause);
+                                    server.execute(() ->
+                                        source.sendSuccess(() -> Component.literal(msg), false));
+                                    return null;
+                                });
+
+                            return 1;
+                        })))
         );
     }
 }
