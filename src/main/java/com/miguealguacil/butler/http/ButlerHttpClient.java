@@ -90,7 +90,10 @@ public final class ButlerHttpClient {
                         JsonObject obj = el.getAsJsonObject();
                         actions.add(new ButlerAction(
                                 obj.get("type").getAsString(),
-                                obj.get("message").getAsString()));
+                                obj.get("message").getAsString(),
+                                obj.has("x") && !obj.get("x").isJsonNull() ? obj.get("x").getAsInt() : null,
+                                obj.has("y") && !obj.get("y").isJsonNull() ? obj.get("y").getAsInt() : null,
+                                obj.has("z") && !obj.get("z").isJsonNull() ? obj.get("z").getAsInt() : null));
                     }
                     return actions;
                 });

@@ -65,7 +65,7 @@ public final class ButlerCommand {
                 .then(Commands.literal("mock")
                     .executes(ctx -> {
                         ButlerActionExecutor.execute(
-                            new ButlerAction("speak", "He recibido una acción mock correctamente."),
+                            new ButlerAction("speak", "He recibido una acción mock correctamente.", null, null, null),
                             ctx.getSource());
                         return 1;
                     }))
