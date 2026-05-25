@@ -3,6 +3,8 @@ package com.miguealguacil.butler.command;
 import com.miguealguacil.butler.AIButler;
 import com.miguealguacil.butler.action.ButlerAction;
 import com.miguealguacil.butler.action.ButlerActionExecutor;
+import com.miguealguacil.butler.entity.AlfredEntities;
+import com.miguealguacil.butler.entity.AlfredEntity;
 import com.miguealguacil.butler.http.ButlerHttpClient;
 import com.miguealguacil.butler.state.ButlerState;
 import com.mojang.brigadier.CommandDispatcher;
@@ -12,7 +14,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.util.Optional;
 
 public final class ButlerCommand {
     private ButlerCommand() {}
@@ -67,6 +72,49 @@ public final class ButlerCommand {
                         ButlerActionExecutor.execute(
                             new ButlerAction("speak", "He recibido una acción mock correctamente.", null, null, null),
                             ctx.getSource());
+                        return 1;
+                    }))
+                .then(Commands.literal("spawn")
+                    .executes(ctx -> {
+                        CommandSourceStack source = ctx.getSource();
+                        ServerPlayer player = source.getPlayerOrException();
+                        ServerLevel level = source.getLevel();
+                        Optional<AlfredEntity> existing = ButlerState.findAlfred(level);
+                        if (existing.isPresent()) {
+                            existing.get().teleportTo(player.getX(), player.getY(), player.getZ());
+                            source.sendSuccess(() -> Component.literal("Alfred ha sido teleportado a tu posición."), false);
+                        } else {
+                            AlfredEntity alfred = new AlfredEntity(AlfredEntities.ALFRED, level);
+                            alfred.setPos(player.getX(), player.getY(), player.getZ());
+                            level.addFreshEntity(alfred);
+                            source.sendSuccess(() -> Component.literal("Alfred ha aparecido."), false);
+                        }
+                        return 1;
+                    }))
+                .then(Commands.literal("follow")
+                    .executes(ctx -> {
+                        CommandSourceStack source = ctx.getSource();
+                        source.getPlayerOrException();
+                        Optional<AlfredEntity> alfred = ButlerState.findAlfred(source.getLevel());
+                        if (alfred.isEmpty()) {
+                            source.sendSuccess(() -> Component.literal("Alfred no está en el mundo. Usa /butler spawn primero."), false);
+                        } else {
+                            alfred.get().setFollowing(true);
+                            source.sendSuccess(() -> Component.literal("[Alfred] Siguiéndote."), false);
+                        }
+                        return 1;
+                    }))
+                .then(Commands.literal("stop")
+                    .executes(ctx -> {
+                        CommandSourceStack source = ctx.getSource();
+                        source.getPlayerOrException();
+                        Optional<AlfredEntity> alfred = ButlerState.findAlfred(source.getLevel());
+                        if (alfred.isEmpty()) {
+                            source.sendSuccess(() -> Component.literal("Alfred no está en el mundo."), false);
+                        } else {
+                            alfred.get().setFollowing(false);
+                            source.sendSuccess(() -> Component.literal("[Alfred] Me detengo."), false);
+                        }
                         return 1;
                     }))
                 .then(Commands.literal("ask")
