@@ -16,6 +16,7 @@ public class AlfredEntity extends PathfinderMob {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new AlfredFollowGoal(this, 0.6));
     }
 
     public boolean isFollowing() {
