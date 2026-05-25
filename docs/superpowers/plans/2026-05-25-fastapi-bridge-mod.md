@@ -52,7 +52,7 @@ public final class ButlerHttpClient {
 
     private static final String BASE_URL = "http://localhost:8000";
     private static final String USERNAME = "admin";
-    private static final String PASSWORD = "admin";
+    private static final String PASSWORD = "ChangeMe123!";
 
     private static final HttpClient HTTP = HttpClient.newHttpClient();
     private static final Gson GSON = new Gson();
@@ -74,7 +74,7 @@ public final class ButlerHttpClient {
         body.addProperty("password", PASSWORD);
 
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/login"))
+                .uri(URI.create(BASE_URL + "/api/auth/login"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
@@ -94,7 +94,7 @@ public final class ButlerHttpClient {
         body.addProperty("message", message);
 
         HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/ask"))
+                .uri(URI.create(BASE_URL + "/api/butler/ask"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
@@ -311,7 +311,7 @@ git commit -m "feat: add /butler ask command with async FastAPI bridge"
 ```powershell
 cd "C:\Users\migue\Documents\Proyectos\MinecraftButlerAI Backend"
 .venv\Scripts\Activate.ps1
-uvicorn main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8000
 ```
 
 - [ ] **Step 2: Launch Minecraft**
@@ -358,7 +358,7 @@ Start uvicorn again. Run `/butler ask` twice in a row quickly:
 ```
 
 Expected: both work. The second call skips `/login` (token cached from the first).
-You can verify in the uvicorn logs: the first call shows two requests (`POST /login`, `POST /ask`), the second shows only one (`POST /ask`).
+You can verify in the uvicorn logs: the first call shows two requests (`POST /api/auth/login`, `POST /api/butler/ask`), the second shows only one (`POST /api/butler/ask`).
 
 - [ ] **Step 6: Final commit**
 
