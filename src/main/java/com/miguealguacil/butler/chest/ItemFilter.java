@@ -16,13 +16,15 @@ public final class ItemFilter {
 
     /**
      * Returns true if {@code stack} matches any entry in {@code accepts}.
-     * Empty list = accept everything.
-     * Entries starting with '#' are treated as item tags (e.g. "#minecraft:logs").
-     * All other entries are treated as exact item IDs (e.g. "minecraft:oak_log").
+     * Empty list = accept nothing (no filter configured).
+     * "#generic" = accept any item (explicit catch-all).
+     * "#namespace:tag" = accept items belonging to that tag (e.g. "#minecraft:logs").
+     * "namespace:item" = accept that exact item ID (e.g. "minecraft:oak_log").
      */
     public static boolean matches(ItemStack stack, List<String> accepts) {
-        if (accepts.isEmpty()) return true;
+        if (accepts.isEmpty()) return false;
         for (String filter : accepts) {
+            if (filter.equals("#generic")) return true;
             try {
                 if (filter.startsWith("#")) {
                     Identifier tagId = Identifier.parse(filter.substring(1));
