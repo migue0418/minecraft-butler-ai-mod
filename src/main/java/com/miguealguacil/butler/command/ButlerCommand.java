@@ -6,6 +6,7 @@ import com.miguealguacil.butler.action.ButlerActionExecutor;
 import com.miguealguacil.butler.chest.ChestEntry;
 import com.miguealguacil.butler.chest.ChestItemMover;
 import com.miguealguacil.butler.chest.ChestRegistry;
+import com.miguealguacil.butler.chest.ItemFilter;
 import com.miguealguacil.butler.entity.AlfredEntities;
 import com.miguealguacil.butler.entity.AlfredEntity;
 import com.miguealguacil.butler.http.ButlerHttpClient;
@@ -362,10 +363,8 @@ public final class ButlerCommand {
             ItemStack slot = srcCont.getItem(i);
             if (slot.isEmpty()) continue;
 
-            String itemId = BuiltInRegistries.ITEM.getKey(slot.getItem()).toString();
-
             Optional<ChestEntry> destOpt = ChestRegistry.getAll().stream()
-                .filter(e -> !e.name().equals(srcName) && e.accepts().contains(itemId))
+                .filter(e -> !e.name().equals(srcName) && ItemFilter.matches(slot, e.accepts()))
                 .findFirst();
 
             if (destOpt.isEmpty()) { unassigned += slot.getCount(); continue; }
