@@ -1,6 +1,6 @@
-# MinecraftButlerAI — Mod
+# MinecraftButlerAI: Mod
 
-> The in-game half of MinecraftButlerAI. Adds Alfred, an AI butler entity you can summon, command, and talk to —
+> The in-game half of MinecraftButlerAI. Adds Alfred, an AI butler entity you can summon, command, and talk to
 > in chat or by voice. Alfred executes real actions in the world: managing chests, moving, responding.
 
 ![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)
@@ -13,16 +13,16 @@
 
 ## Part of the MinecraftButlerAI system
 
-This mod is the **in-game client**. The AI brain lives in the backend:
+This mod is the in-game client. The AI brain lives in the backend:
 
 ```
-[You]  →  /butler ask "put diamonds in the diamond chest"
-              │
-              ▼  HTTP + JWT
-[Backend]  →  LangGraph agent  →  RAG · Whisper · Redis memory
-              │
-              ▼  ButlerAction[]
-[Mod]  →  executes: move_to_position / speak / chest distribute / ...
+[You]  ->  /butler ask "put diamonds in the diamond chest"
+               |
+               v  HTTP + JWT
+[Backend]  ->  LangGraph agent  ->  RAG · Whisper · Redis memory
+               |
+               v  ButlerAction[]
+[Mod]  ->  executes: move_to_position / speak / chest distribute / ...
 ```
 
 Backend repo: [minecraft-butler-ai-backend](https://github.com/migue0418/minecraft-butler-ai-backend)
@@ -36,7 +36,7 @@ Backend repo: [minecraft-butler-ai-backend](https://github.com/migue0418/minecra
 
 **In-game commands**
 ```
-/butler ask <message>       Ask Alfred anything — he reasons and acts
+/butler ask <message>       Ask Alfred anything - he reasons and acts
 /butler spawn               Summon Alfred at your position
 /butler follow              Alfred follows you
 /butler stop                Alfred stays put
@@ -55,7 +55,7 @@ Backend repo: [minecraft-butler-ai-backend](https://github.com/migue0418/minecra
 /butler chest distribute <src>          Distribute chest contents to matching chests
 ```
 
-**Voice input** — send audio to the backend and Alfred transcribes and acts on it (via the backend's `/ask-voice` endpoint with faster-whisper)
+**Voice input** - send audio to the backend and Alfred transcribes and acts on it (via the backend's `/ask-voice` endpoint with faster-whisper)
 
 ## Requirements
 
@@ -71,11 +71,11 @@ Backend repo: [minecraft-butler-ai-backend](https://github.com/migue0418/minecra
    ./gradlew build
    ```
 3. Copy the `.jar` from `build/libs/` into your Minecraft `mods/` folder
-4. Launch Minecraft with Fabric — Alfred is ready
+4. Launch Minecraft with Fabric
 
 ## How it works
 
-The mod communicates with the backend over HTTP. On startup it authenticates (JWT), then every `/butler ask` sends the message to `/api/butler/ask` and receives a list of `ButlerAction` objects that are executed server-side:
+The mod communicates with the backend over HTTP. On startup it authenticates with JWT, then every `/butler ask` sends the message to `/api/butler/ask` and receives a list of `ButlerAction` objects that are executed server-side:
 
 ```java
 // ButlerAction record
