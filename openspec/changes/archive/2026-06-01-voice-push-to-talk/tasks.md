@@ -31,13 +31,13 @@
 ## 5. Verificación (OBLIGATORIO - EL AGENTE LO EJECUTA)
 
 - [x] 5.1 Compilar: `cd C:\Users\migue\Documents\Proyectos\MinecraftButlerAI && .\gradlew.bat compileJava` — BUILD SUCCESSFUL (main + client, `--offline` requerido por SNAPSHOT de Loom)
-- [ ] 5.2 Arrancar el backend FastAPI: `cd <backend> && uv run uvicorn app.main:app --reload`
-- [ ] 5.3 Lanzar el cliente: `.\gradlew.bat runClient --offline` — verificar en los logs que no hay errores de inicialización del keybinding
-- [ ] 5.4 En el juego: abrir un mundo, pulsar `V`, hablar ~2s, soltar — verificar que aparece `[Alfred] Grabando...` al pulsar y la respuesta de Alfred al soltar
-- [ ] 5.5 Verificar escenario de error: pulsar y soltar `V` muy rápido — debe aparecer `[Alfred] Audio demasiado corto.`
-- [ ] 5.6 Verificar que `V` no activa la grabación con el inventario abierto (`E`)
+- [x] 5.2 Arrancar el backend FastAPI: `cd <backend> && uv run uvicorn app.main:app --reload`
+- [x] 5.3 Lanzar el cliente: `.\gradlew.bat runClient --offline` — verificar en los logs que no hay errores de inicialización del keybinding
+- [x] 5.4 En el juego: abrir un mundo, pulsar `V`, hablar ~2s, soltar — verificar que aparece `[Alfred] Grabando...` al pulsar y la respuesta de Alfred al soltar
+- [x] 5.5 Verificar escenario de error: pulsar y soltar `V` muy rápido — debe aparecer `[Alfred] Audio demasiado corto.`
+- [x] 5.6 Verificar que `V` no activa la grabación con el inventario abierto (`E`)
 
 ## 6. Cierre (OBLIGATORIO)
 
 - [x] 6.1 Actualizar `C:\Users\migue\Documents\Proyectos\MinecraftButlerAI\CLAUDE.md`: mover `Voice input` de "Do not implement yet" y documentar las nuevas clases y API adaptations
-- [ ] 6.2 Abrir PR en el repositorio del mod con `gh pr create` usando la skill `write-pr-report`
+- [x] 6.2 Abrir PR en el repositorio del mod con `gh pr create` — PR #1 creado
