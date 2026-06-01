@@ -1,0 +1,54 @@
+# Configuración de proyecto para OpenSpec
+# Docs: https://github.com/Fission-AI/OpenSpec
+# `context` se inyecta en TODOS los artefactos; `rules` solo en el artefacto indicado.
+schema: spec-driven
+
+context: |
+  # MinecraftButlerAI — Fabric Mod
+
+  ## Mod (raíz del repositorio)
+  - Minecraft Java Edition. Mod loader: **Fabric**. Lenguaje: **Java 25**.
+  - Build: **Gradle + Fabric Loom** (`./gradlew.bat`). Gestor de entorno: IntelliJ IDEA.
+  - Fabric API: `0.149.1+26.1.2`. Minecraft version: `26.1.2`.
+  - Split source sets (`loom.splitEnvironmentSourceSets()`):
+    - `src/main/` → código server-side y compartido (commands, HTTP client, actions, entities).
+    - `src/client/` → código client-side (rendering, keybindings, audio, UI).
+  - Entrypoints: `AIButler` (main) y `AIButlerClient` (client).
+  - Registro de comandos vía `CommandRegistrationCallback` (Brigadier).
+  - Registro de keybindings vía `KeyBindingHelper` + `ClientTickEvents` (client sourceset).
+
+  ## Arquitectura por paquete bajo `com.miguealguacil.butler`
+  - `command/` — comandos Brigadier server-side.
+  - `http/` — `ButlerHttpClient` (java.net.http, multipart, JWT cache).
+  - `action/` — `ButlerAction` record + `ButlerActionExecutor`.
+  - `entity/` — `AlfredEntity`, `AlfredEntities`, `AlfredFollowGoal`.
+  - `chest/` — `ChestRegistry`, `ChestItemMover`, `ChestEntry`, `ItemFilter`.
+  - `state/` — `ButlerState` (estado en memoria server-side).
+  - `client/voice/` — audio push-to-talk (client sourceset).
+
+  ## Convenciones
+  - Mensajes de usuario en español; identificadores de código en inglés.
+  - Sin dependencias nuevas salvo que sea imprescindible (usar JDK built-ins, Fabric API).
+  - Incrementos pequeños que compilan: verificar con `.\gradlew.bat compileJava` tras cada cambio.
+  - Verificación completa: `.\gradlew.bat runClient`.
+  - No implementar nada que permita al LLM ejecutar comandos arbitrarios de Minecraft.
+  - Estándares: `CLAUDE.md`.
+
+rules:
+  proposal:
+    - Indica qué sourceset se ve afectado (main, client, o ambos).
+    - Si el cambio añade dependencias Gradle, adviértelo explícitamente.
+  specs:
+    - Usa formato When/Then en los escenarios.
+    - Cubre casos de error (micrófono no disponible, backend caído, audio demasiado corto, etc.).
+  design:
+    - Describe el cambio paquete por paquete (command → http → action → entity → client/voice).
+    - Indica si el código es main o client sourceset.
+    - "OBLIGATORIO: antes de /opsx:apply, genera el plan técnico a nivel de archivos con el agente mod-developer en `.claude/doc/<change>/mod.md`. No es opcional."
+  tasks:
+    - "Antes de escribir tasks.md, lee `.claude/rules/openspec-tasks-mandatory-steps.md`."
+    - "Paso 0 (obligatorio, el primero): crear rama `feature/<change-name>`."
+    - "Obligatorio: compilar con `./gradlew.bat compileJava` sin errores."
+    - "Obligatorio: verificar con `./gradlew.bat runClient` y prueba manual en el juego ejecutada por el agente."
+    - "Obligatorio: actualizar `CLAUDE.md` si cambia el alcance de features implementadas."
+    - "Paso final: abrir el PR con `gh` usando la skill write-pr-report."

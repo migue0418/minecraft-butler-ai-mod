@@ -45,7 +45,6 @@ Do **not** implement yet:
 - Custom NPC model.
 - GeckoLib.
 - Blockbench assets.
-- Voice input.
 - Text-to-speech.
 - LLM API calls.
 - OpenAI/Ollama integration.
@@ -131,9 +130,30 @@ state/
 action/
   ButlerAction.java
   ButlerActionExecutor.java
+
+http/
+  ButlerHttpClient.java      (main sourceset — HTTP client for /ask and /ask-voice)
+
+client/voice/                (client sourceset)
+  VoiceRecorder.java         (javax.sound.sampled capture → WAV bytes)
+  VoiceKeyBinding.java       (push-to-talk: key V, ClientTickEvents polling)
 ```
 
 Only create these packages if they do not already exist.
+
+## Voice push-to-talk (implemented)
+
+The mod includes a push-to-talk system (change: `voice-push-to-talk`):
+
+- Hold `V` → records microphone audio via `javax.sound.sampled.TargetDataLine`
+- Release `V` → sends WAV to `POST /api/butler/ask-voice` → executes returned `ButlerAction` list
+- Max 30s recording; auto-sends if limit reached
+- Min 300ms check; shows `[Alfred] Audio demasiado corto.` if too short
+- Ignores key press when a UI screen is open
+- Uses `KeyMappingHelper.registerKeyMapping()` (Fabric API `fabric-key-mapping-api-v1` 0.149+)
+- Uses `KeyMapping.Category.GAMEPLAY` (not the old String category)
+- Uses `mc.gui.getChat().addClientSystemMessage()` for client-side chat messages
+- Only works in singleplayer / LAN (integrated server). Dedicated server requires network packets (future phase).
 
 ## Recommended implementation approach
 
