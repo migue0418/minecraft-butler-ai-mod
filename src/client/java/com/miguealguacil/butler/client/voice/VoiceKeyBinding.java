@@ -1,6 +1,8 @@
 package com.miguealguacil.butler.client.voice;
 
 import com.miguealguacil.butler.action.ButlerActionExecutor;
+import com.miguealguacil.butler.context.WorldContext;
+import com.miguealguacil.butler.context.WorldContextCollector;
 import com.miguealguacil.butler.http.ButlerHttpClient;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -75,11 +77,14 @@ public final class VoiceKeyBinding {
             sendClientMessage(mc, "[Alfred] Solo funciona en partida local.");
             return;
         }
-        ButlerHttpClient.sendVoiceAsync(wav)
+        ServerPlayer player = server.getPlayerList().getPlayers().stream().findFirst().orElse(null);
+        WorldContext worldCtx = (player != null) ? WorldContextCollector.collect(player, server) : null;
+
+        ButlerHttpClient.sendVoiceAsync(wav, worldCtx)
                 .thenAccept(actions -> server.execute(() -> {
-                    ServerPlayer player = server.getPlayerList().getPlayers().stream().findFirst().orElse(null);
-                    if (player == null) return;
-                    actions.forEach(a -> ButlerActionExecutor.execute(a, player.createCommandSourceStack()));
+                    ServerPlayer p = server.getPlayerList().getPlayers().stream().findFirst().orElse(null);
+                    if (p == null) return;
+                    actions.forEach(a -> ButlerActionExecutor.execute(a, p.createCommandSourceStack()));
                 }))
                 .exceptionally(ex -> {
                     Throwable cause = ex.getCause() != null ? ex.getCause() : ex;

@@ -9,6 +9,8 @@ import com.miguealguacil.butler.chest.ChestRegistry;
 import com.miguealguacil.butler.chest.ItemFilter;
 import com.miguealguacil.butler.entity.AlfredEntities;
 import com.miguealguacil.butler.entity.AlfredEntity;
+import com.miguealguacil.butler.context.WorldContext;
+import com.miguealguacil.butler.context.WorldContextCollector;
 import com.miguealguacil.butler.http.ButlerHttpClient;
 import com.miguealguacil.butler.state.ButlerState;
 import com.mojang.brigadier.CommandDispatcher;
@@ -142,11 +144,14 @@ public final class ButlerCommand {
                             CommandSourceStack source = ctx.getSource();
                             MinecraftServer server = source.getServer();
                             String message = StringArgumentType.getString(ctx, "message");
+                            ServerPlayer player = source.getPlayerOrException();
 
                             source.sendSuccess(
                                 () -> Component.literal("[Alfred] Procesando..."), false);
 
-                            ButlerHttpClient.sendAsync(message)
+                            WorldContext worldCtx = WorldContextCollector.collect(player, server);
+
+                            ButlerHttpClient.sendAsync(message, worldCtx)
                                 .thenAccept(actions ->
                                     server.execute(() ->
                                         actions.forEach(action ->

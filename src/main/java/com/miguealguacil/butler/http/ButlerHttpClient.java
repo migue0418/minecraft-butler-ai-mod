@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.miguealguacil.butler.action.ButlerAction;
+import com.miguealguacil.butler.context.WorldContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,9 +74,12 @@ public final class ButlerHttpClient {
                 });
     }
 
-    private static CompletableFuture<List<ButlerAction>> askAsync(String message, String token) {
+    private static CompletableFuture<List<ButlerAction>> askAsync(String message, WorldContext context, String token) {
         JsonObject body = new JsonObject();
         body.addProperty("message", message);
+        if (context != null) {
+            body.add("world_context", worldContextToJson(context));
+        }
 
         HttpRequest req = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/api/butler/ask"))
@@ -95,46 +99,60 @@ public final class ButlerHttpClient {
                 });
     }
 
-    public static CompletableFuture<List<ButlerAction>> sendAsync(String message) {
+    public static CompletableFuture<List<ButlerAction>> sendAsync(String message, WorldContext context) {
         if (cachedToken == null) {
-            return loginAsync().thenCompose(token -> askAsync(message, token));
+            return loginAsync().thenCompose(token -> askAsync(message, context, token));
         }
-        return askAsync(message, cachedToken)
+        return askAsync(message, context, cachedToken)
                 .exceptionallyCompose(ex -> {
                     Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
                     if (cause instanceof AuthException) {
                         cachedToken = null;
-                        return loginAsync().thenCompose(token -> askAsync(message, token));
+                        return loginAsync().thenCompose(token -> askAsync(message, context, token));
                     }
                     return CompletableFuture.failedFuture(cause);
                 });
     }
 
-    public static CompletableFuture<List<ButlerAction>> sendVoiceAsync(byte[] wavBytes) {
+    public static CompletableFuture<List<ButlerAction>> sendVoiceAsync(byte[] wavBytes, WorldContext context) {
         if (cachedToken == null) {
-            return loginAsync().thenCompose(token -> askVoiceAsync(wavBytes, token));
+            return loginAsync().thenCompose(token -> askVoiceAsync(wavBytes, context, token));
         }
-        return askVoiceAsync(wavBytes, cachedToken)
+        return askVoiceAsync(wavBytes, context, cachedToken)
                 .exceptionallyCompose(ex -> {
                     Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
                     if (cause instanceof AuthException) {
                         cachedToken = null;
-                        return loginAsync().thenCompose(token -> askVoiceAsync(wavBytes, token));
+                        return loginAsync().thenCompose(token -> askVoiceAsync(wavBytes, context, token));
                     }
                     return CompletableFuture.failedFuture(cause);
                 });
     }
 
-    private static CompletableFuture<List<ButlerAction>> askVoiceAsync(byte[] wavBytes, String token) {
+    private static CompletableFuture<List<ButlerAction>> askVoiceAsync(byte[] wavBytes, WorldContext context, String token) {
         String boundary = UUID.randomUUID().toString().replace("-", "");
         ByteArrayOutputStream body = new ByteArrayOutputStream();
         try {
-            String partHeader = "--" + boundary + "\r\n"
+            // Part 1: audio
+            String audioHeader = "--" + boundary + "\r\n"
                     + "Content-Disposition: form-data; name=\"audio\"; filename=\"voice.wav\"\r\n"
                     + "Content-Type: audio/wav\r\n\r\n";
-            body.write(partHeader.getBytes(StandardCharsets.UTF_8));
+            body.write(audioHeader.getBytes(StandardCharsets.UTF_8));
             body.write(wavBytes);
-            body.write(("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+            body.write("\r\n".getBytes(StandardCharsets.UTF_8));
+
+            // Part 2: world_context as JSON form field (ignored by backend until adapted)
+            if (context != null) {
+                String contextJson = worldContextToJson(context).toString();
+                String contextHeader = "--" + boundary + "\r\n"
+                        + "Content-Disposition: form-data; name=\"world_context\"\r\n"
+                        + "Content-Type: application/json\r\n\r\n";
+                body.write(contextHeader.getBytes(StandardCharsets.UTF_8));
+                body.write(contextJson.getBytes(StandardCharsets.UTF_8));
+                body.write("\r\n".getBytes(StandardCharsets.UTF_8));
+            }
+
+            body.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             return CompletableFuture.failedFuture(e);
         }
@@ -169,5 +187,61 @@ public final class ButlerHttpClient {
                     obj.has("z") && !obj.get("z").isJsonNull() ? obj.get("z").getAsInt() : null));
         }
         return actions;
+    }
+
+    private static JsonElement worldContextToJson(WorldContext ctx) {
+        JsonObject root = new JsonObject();
+
+        JsonObject playerObj = new JsonObject();
+        playerObj.addProperty("x", ctx.player().x());
+        playerObj.addProperty("y", ctx.player().y());
+        playerObj.addProperty("z", ctx.player().z());
+        JsonArray invArr = new JsonArray();
+        for (var entry : ctx.player().inventory()) {
+            JsonObject e = new JsonObject();
+            e.addProperty("item", entry.item());
+            e.addProperty("count", entry.count());
+            invArr.add(e);
+        }
+        playerObj.add("inventory", invArr);
+        root.add("player", playerObj);
+
+        JsonArray chestsArr = new JsonArray();
+        for (var chest : ctx.chests()) {
+            JsonObject c = new JsonObject();
+            c.addProperty("name", chest.name());
+            JsonArray itemsArr = new JsonArray();
+            for (var item : chest.items()) {
+                JsonObject i = new JsonObject();
+                i.addProperty("item", item.item());
+                i.addProperty("count", item.count());
+                itemsArr.add(i);
+            }
+            c.add("items", itemsArr);
+            chestsArr.add(c);
+        }
+        root.add("chests", chestsArr);
+
+        JsonObject nearbyObj = new JsonObject();
+        JsonArray animalsArr = new JsonArray();
+        for (var ag : ctx.nearby().animals()) {
+            JsonObject a = new JsonObject();
+            a.addProperty("type", ag.type());
+            a.addProperty("count", ag.count());
+            animalsArr.add(a);
+        }
+        nearbyObj.add("animals", animalsArr);
+        JsonArray cropsArr = new JsonArray();
+        for (var cg : ctx.nearby().crops()) {
+            JsonObject c = new JsonObject();
+            c.addProperty("type", cg.type());
+            c.addProperty("mature", cg.mature());
+            c.addProperty("growing", cg.growing());
+            cropsArr.add(c);
+        }
+        nearbyObj.add("crops", cropsArr);
+        root.add("nearby", nearbyObj);
+
+        return root;
     }
 }
