@@ -231,6 +231,14 @@ public final class ButlerHttpClient {
             animalsArr.add(a);
         }
         nearbyObj.add("animals", animalsArr);
+        JsonArray monstersArr = new JsonArray();
+        for (var mg : ctx.nearby().monsters()) {
+            JsonObject m = new JsonObject();
+            m.addProperty("type", mg.type());
+            m.addProperty("count", mg.count());
+            monstersArr.add(m);
+        }
+        nearbyObj.add("monsters", monstersArr);
         JsonArray cropsArr = new JsonArray();
         for (var cg : ctx.nearby().crops()) {
             JsonObject c = new JsonObject();
