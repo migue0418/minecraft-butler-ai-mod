@@ -22,10 +22,10 @@
 ## 4. Prueba en el juego (OBLIGATORIO - EL AGENTE LO EJECUTA)
 
 - [x] 4.1 `.\gradlew.bat runClient` → verificar logs de inicio sin errores
-- [ ] 4.2 Con un cofre registrado con items: hacer `/butler ask "qué hay en mis cofres"` y verificar que `chests` llega al backend con contenido
-- [ ] 4.3 Con un zombie/araña cerca: hacer `/butler ask "hay algún peligro cerca"` y verificar que `nearby.monsters` llega al backend
-- [ ] 4.4 Verificar que `nearby.animals` sigue funcionando (ovejas, vacas, etc.)
-- [ ] 4.5 Documentar resultados en `openspec/changes/world-context-mobs/reports/`
+- [x] 4.2 Con un cofre registrado con items: hacer `/butler ask "qué hay en mis cofres"` y verificar que `chests` llega al backend con contenido
+- [x] 4.3 Con un zombie/araña cerca: hacer `/butler ask "hay algún peligro cerca"` y verificar que `nearby.monsters` llega al backend
+- [x] 4.4 Verificar que `nearby.animals` sigue funcionando (ovejas, vacas, etc.)
+- [x] 4.5 Documentar resultados en `openspec/changes/world-context-mobs/reports/`
 
 ## 5. Cierre (OBLIGATORIO)
 
