@@ -147,13 +147,14 @@ Only create these packages if they do not already exist.
 
 ## World context collector (implemented)
 
-The mod sends a world snapshot with every request to Alfred (change: `world-context-collector`):
+The mod sends a world snapshot with every request to Alfred (changes: `world-context-collector`, `world-context-mobs`):
 
 - `WorldContextCollector.collect(player, server)` is called before each HTTP request
-- Scans: player inventory, registered chests (real-time BlockEntity read), animals within 30 blocks, crops within 20 blocks (height ±5)
+- Scans: player inventory, registered chests (real-time BlockEntity read), animals and monsters separately within ±25 blocks horizontal / ±5 vertical, crops within 20 blocks (height ±5)
+- `WorldContext.NearbyContext` has three fields: `animals` (`Animal.class`), `monsters` (`Monster.class`), `crops`
 - `WorldContext` is serialized as `world_context` field in `/ask` JSON body and as a multipart form field in `/ask-voice`
-- Backend ignores `world_context` until adapted in a separate backend change
-- Chest scan skips unloaded chunks silently; crop scan uses `CropBlock.getAge(state)` / `CropBlock.getMaxAge()`
+- Backend ignores `world_context` until adapted in a separate backend change; `nearby.monsters` field is new in this change
+- Chest scan uses `getBlockEntity` directly (no `isLoaded` check); crop scan uses `CropBlock.getAge(state)` / `CropBlock.getMaxAge()`
 - Only works in singleplayer / LAN for the voice path (same constraint as push-to-talk)
 
 ## Voice push-to-talk (implemented)

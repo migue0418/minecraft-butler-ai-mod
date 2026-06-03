@@ -19,6 +19,7 @@ public record WorldContext(
 
     public record NearbyContext(
             List<AnimalGroup> animals,
+            List<AnimalGroup> monsters,
             List<CropGroup> crops
     ) {}
 

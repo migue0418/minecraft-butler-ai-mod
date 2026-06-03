@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -35,6 +36,7 @@ public final class WorldContextCollector {
                 collectChests(server),
                 new WorldContext.NearbyContext(
                         collectAnimals(player, level),
+                        collectMonsters(player, level),
                         collectCrops(player, level)
                 )
         );
@@ -67,7 +69,6 @@ public final class WorldContextCollector {
                     ResourceKey.create(Registries.DIMENSION, Identifier.parse(entry.dimension())));
             if (level == null) continue;
             BlockPos pos = entry.blockPos();
-            if (!level.isLoaded(pos)) continue;
             BlockEntity be = level.getBlockEntity(pos);
             if (!(be instanceof Container container)) continue;
             Map<String, Integer> counts = new HashMap<>();
@@ -88,13 +89,29 @@ public final class WorldContextCollector {
     }
 
     private static List<WorldContext.AnimalGroup> collectAnimals(ServerPlayer player, ServerLevel level) {
-        double r = 30.0;
         double x = player.getX(), y = player.getY(), z = player.getZ();
-        AABB box = new AABB(x - r, y - r, z - r, x + r, y + r, z + r);
+        AABB box = new AABB(x - 25, y - 5, z - 25, x + 25, y + 5, z + 25);
         List<Animal> animals = level.getEntitiesOfClass(Animal.class, box, e -> true);
         Map<String, Integer> counts = new HashMap<>();
         for (Animal animal : animals) {
             String typeId = BuiltInRegistries.ENTITY_TYPE.getKey(animal.getType()).toString();
+            counts.merge(typeId, 1, Integer::sum);
+        }
+        List<WorldContext.AnimalGroup> result = new ArrayList<>();
+        for (Map.Entry<String, Integer> e : counts.entrySet()) {
+            result.add(new WorldContext.AnimalGroup(e.getKey(), e.getValue()));
+        }
+        result.sort((a, b) -> b.count() - a.count());
+        return result;
+    }
+
+    private static List<WorldContext.AnimalGroup> collectMonsters(ServerPlayer player, ServerLevel level) {
+        double x = player.getX(), y = player.getY(), z = player.getZ();
+        AABB box = new AABB(x - 25, y - 5, z - 25, x + 25, y + 5, z + 25);
+        List<Monster> monsters = level.getEntitiesOfClass(Monster.class, box, e -> true);
+        Map<String, Integer> counts = new HashMap<>();
+        for (Monster monster : monsters) {
+            String typeId = BuiltInRegistries.ENTITY_TYPE.getKey(monster.getType()).toString();
             counts.merge(typeId, 1, Integer::sum);
         }
         List<WorldContext.AnimalGroup> result = new ArrayList<>();
