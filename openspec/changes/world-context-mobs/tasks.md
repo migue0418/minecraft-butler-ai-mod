@@ -21,7 +21,7 @@
 
 ## 4. Prueba en el juego (OBLIGATORIO - EL AGENTE LO EJECUTA)
 
-- [ ] 4.1 `.\gradlew.bat runClient` → verificar logs de inicio sin errores
+- [x] 4.1 `.\gradlew.bat runClient` → verificar logs de inicio sin errores
 - [ ] 4.2 Con un cofre registrado con items: hacer `/butler ask "qué hay en mis cofres"` y verificar que `chests` llega al backend con contenido
 - [ ] 4.3 Con un zombie/araña cerca: hacer `/butler ask "hay algún peligro cerca"` y verificar que `nearby.monsters` llega al backend
 - [ ] 4.4 Verificar que `nearby.animals` sigue funcionando (ovejas, vacas, etc.)
@@ -29,5 +29,5 @@
 
 ## 5. Cierre (OBLIGATORIO)
 
-- [ ] 5.1 Actualizar `CLAUDE.md` — sección world context collector: reflejar campos `animals`/`monsters` separados, nuevo radio ±25/±5, y fix `isLoaded`
-- [ ] 5.2 PR con `gh` (skill `write-pr-report`)
+- [x] 5.1 Actualizar `CLAUDE.md` — sección world context collector: reflejar campos `animals`/`monsters` separados, nuevo radio ±25/±5, y fix `isLoaded`
+- [x] 5.2 PR con `gh` (skill `write-pr-report`)
